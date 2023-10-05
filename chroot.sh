@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 
-unset installed_gpu,proc_count
+unset installed_gpu
 
 # updating environment
 env-update
 source /etc/profile
 PS1="(chroot) ${PS1}"
-
-# detecting processor cores/threads
-echo "--- Detecting CPU --- "
-makeopts_proc=$(nproc)
 
 # sync portage snapshot
 echo "--- Syncing portage snapshot ---"
@@ -31,32 +27,33 @@ fi
 
 # writing make.conf
 echo "--- Writing make.conf --- "
-echo 'COMMON_FLAGS="-march=native -O2 -pipe"
-CFLAGS="${COMMON_FLAGS}"
-CXXFLAGS="${COMMON_FLAGS}"
-FCFLAGS="${COMMON_FLAGS}"
-FFLAGS="${COMMON_FLAGS}"
-CPU_FLAGS_X86="$(cpuid2cpuflags)"
-MAKEOPTS="-j${makeopts_proc} -l${makeopts_proc}"
-EMERGE_DEFAULT_OPTS="--keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep --ask"
-USE=""
+echo "COMMON_FLAGS=\"-march=native -O2 -pipe\"
+CFLAGS=\"${COMMON_FLAGS}\"
+CXXFLAGS=\"${COMMON_FLAGS}\"
+FCFLAGS=\"${COMMON_FLAGS}\"
+FFLAGS=\"${COMMON_FLAGS}\"
+CPU_FLAGS_X86=\"$(cpuid2cpuflags)\"
+MAKEOPTS=\"-j$(nproc) -l$(nproc)\"
+EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep --ask\"
 
-ACCEPT_KEYWORDS="~amd64"
-ACCEPT_LICENSE="*"
+USE=\"dist-kernel systemd btrfs udev policykit udisks dbus inotify libnotify networkmanager X screencast wayland xwayland vulkan opengl gtk qt5 qt6 x264 x265 gstreamer pulseaudio pipewire pipewire-jack pipewire-alsa dri vaapi vdpau cups v4l ssl lv2 unicode offensive -dvd -cdr -ios -ipod -clamav -gnome -kde -debug\"
+
+ACCEPT_KEYWORDS=\"~amd64\"
+ACCEPT_LICENSE=\"*\"
 
 # NOTE: This stage was built with the bindist Use flag enabled
-DISTDIR="/var/cache/distfiles"
-PKGDIR="/var/cache/binpkgs"
+DISTDIR=\"/var/cache/distfiles\"
+PKGDIR=\"/var/cache/binpkgs\"
 
 # This sets the language of build output to English.
 # Please keep this setting intact when reporting bugs.
 LC_MESSAGES=C.utf8
 
-VIDEO_CARDS="${installed_gpu}"
-INPUT_DEVICES="libinput"
-GRUB_PLATFORMS="efi-64"
+VIDEO_CARDS=\"${installed_gpu}\"
+INPUT_DEVICES=\"libinput\"
+GRUB_PLATFORMS=\"efi-64\"
 
-GENTOO_MIRRORS="https://mirrors.mit.edu/gentoo-distfiles https://mirrors.rit.edu/gentoo https://mirror.leaseweb.com/gentoo https://gentoo.osuosl.org https://mirror.clarkson.edu/gentoo"' > /etc/portage/make.conf
+GENTOO_MIRRORS=\"https://mirrors.mit.edu/gentoo-distfiles https://mirrors.rit.edu/gentoo https://mirror.leaseweb.com/gentoo https://gentoo.osuosl.org https://mirror.clarkson.edu/gentoo\"" > /etc/portage/make.conf
 
 # set package.use
 echo "--- Writing package.use --- "
