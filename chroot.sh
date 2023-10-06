@@ -9,11 +9,18 @@ PS1="(chroot) ${PS1}"
 
 # sync portage snapshot
 echo "--- Syncing portage snapshot ---"
-emerge-webrsync
+emerge --sync --quiet
+
+# setting locale
+echo "--- Setting locale ---"
+sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+locale-gen
+source /etc/profile
+env-update
 
 # emerging necessary packages for setup
 echo "--- Emerging necessary packages for setup ---"
-emerge --ask app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
+emerge app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
 
 # detecting gpu vendor
 echo "--- Detecting GPU --- "
@@ -36,7 +43,7 @@ CPU_FLAGS_X86=\"$(cpuid2cpuflags)\"
 MAKEOPTS=\"-j$(nproc) -l$(nproc)\"
 EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep --ask\"
 
-USE=\"dist-kernel systemd btrfs udev policykit udisks dbus inotify libnotify networkmanager X screencast wayland xwayland vulkan opengl gtk qt5 qt6 x264 x265 gstreamer pulseaudio pipewire pipewire-jack pipewire-alsa dri vaapi vdpau cups v4l ssl lv2 unicode offensive -dvd -cdr -ios -ipod -clamav -gnome -kde -debug\"
+USE=\"amd64 dist-kernel systemd btrfs udev policykit udisks dbus inotify libnotify networkmanager bzip2 zstd X screencast wayland xwayland vulkan opengl gtk qt5 qt6 x264 x265 gstreamer pulseaudio alsa pipewire pipewire-jack pipewire-alsa dri vaapi vdpau cups v4l ssl lv2 unicode offensive -dvd -cdr -ios -ipod -clamav -gnome -kde -debug\"
 
 ACCEPT_KEYWORDS=\"~amd64\"
 ACCEPT_LICENSE=\"*\"
@@ -58,14 +65,13 @@ GENTOO_MIRRORS=\"https://mirrors.mit.edu/gentoo-distfiles https://mirrors.rit.ed
 # set package.use
 echo "--- Writing package.use --- "
 rm -rf /etc/portage/package.use
-echo 'www-client/ungoogled-chromium-bin widevine
+echo "www-client/ungoogled-chromium-bin widevine
 media-video/vlc -vaapi
 media-libs/libsndfile minimal
 sys-apps/systemd cryptsetup
 sys-boot/grub device-mapper
 sys-kernel/installkernel-gentoo grub
 sys-apps/dbus abi_x86_32
-sys-apps/bubblewrap -suid
 
 # STEAM #
 x11-libs/libX11  abi_x86_32
@@ -102,4 +108,4 @@ x11-libs/extest abi_x86_32
 dev-libs/libevdev abi_x86_32
 dev-libs/wayland abi_x86_32
 virtual/rust abi_x86_32
-dev-lang/rust-bin abi_x86_32' > /etc/portage/package.use
+dev-lang/rust-bin abi_x86_32" > /etc/portage/package.use
