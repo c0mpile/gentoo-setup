@@ -20,7 +20,7 @@ env-update
 
 # emerging necessary packages for setup
 echo "--- Emerging necessary packages for setup ---"
-emerge app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
+emerge --quiet-build app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
 
 # detecting gpu vendor
 echo "--- Detecting GPU --- "
@@ -39,11 +39,11 @@ CFLAGS=\"${COMMON_FLAGS}\"
 CXXFLAGS=\"${COMMON_FLAGS}\"
 FCFLAGS=\"${COMMON_FLAGS}\"
 FFLAGS=\"${COMMON_FLAGS}\"
-CPU_FLAGS_X86=\"$(cpuid2cpuflags)\"
+CPU_FLAGS_X86=\"$(cpuid2cpuflags | sed 's/:\s/="/; s/$/"/')\"
 MAKEOPTS=\"-j$(nproc) -l$(nproc)\"
 EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep --ask\"
 
-USE=\"amd64 dist-kernel systemd btrfs udev policykit udisks dbus inotify libnotify networkmanager bzip2 zstd X screencast wayland xwayland vulkan opengl gtk qt5 qt6 x264 x265 gstreamer pulseaudio alsa pipewire pipewire-jack pipewire-alsa dri vaapi vdpau cups v4l ssl lv2 unicode offensive -dvd -cdr -ios -ipod -clamav -gnome -kde -debug\"
+USE=\"dist-kernel systemd btrfs udev policykit udisks dbus inotify libnotify networkmanager bzip2 zstd X screencast wayland xwayland vulkan opengl gtk qt5 qt6 x264 x265 gstreamer pulseaudio alsa pipewire pipewire-jack pipewire-alsa dri vaapi vdpau cups v4l ssl lv2 unicode offensive amd64 -dvd -cdr -ios -ipod -clamav -gnome -kde -debug\"
 
 ACCEPT_KEYWORDS=\"~amd64\"
 ACCEPT_LICENSE=\"*\"
