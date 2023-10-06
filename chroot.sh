@@ -17,12 +17,18 @@ echo "--- Setting locale ---"
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
 (locale-gen &)
 wait
-eselect locale list
-read -p "Enter the number of your desired locale:" locale_num
-eselect locale set ${locale_num}
+echo "LANG=\"en_US.UTF-8\"
+LC_COLLATE=\"C.UTF-8\"" > /etc/env.d/02locale
+localectl set-locale LANG=en_US.UTF-8
 source /etc/profile
 env-update
 PS1="(chroot) ${PS1}"
+
+# set keyboard layout
+echo "--- Setting keyboard layout ---"
+read -p "Enter desired keyboard layout: " kb_map
+localectl set-keymap ${kb_map}
+localectl set-x11-keymap ${kb_map}
 
 # list and select profile
 eselect profile list
@@ -31,9 +37,9 @@ eselect profile set ${profile_num}
 
 # emerging necessary packages for setup
 echo "--- Emerging necessary packages for setup ---"
+emerge --ask --quiet-build --autounmask-write app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
+dispatch-conf
 emerge --ask --quiet-build app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
-etc-update
-emerge --quiet-build app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
 
 # detecting gpu vendor
 echo "--- Detecting GPU --- "
@@ -87,3 +93,13 @@ emerge --oneshot --ask gpm
 emerge --oneshot --ask sys-apps/portage
 emerge --oneshot --ask ncurses
 emerge -vuDN @world
+
+# copy custom kernel config snippets
+echo "--- Copying custom kernel config snippets ---"
+mkdir -p /etc/kernel/config.d/
+cp /root/gentoo-setup/kernel/* /etc/kernel/config.d/
+
+# emerge kernel
+emerge --ask sys-kernel/linux-firmware
+emerge --ask sys-kernel/installkernel-gentoo
+emerge --ask sys-kernel/gentoo-kernel
