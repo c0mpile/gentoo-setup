@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-unset installed_gpu
+unset installed_gpu,locale_num,profile_num
 
 # updating environment
 env-update
@@ -9,14 +9,16 @@ PS1="(chroot) ${PS1}"
 
 # sync portage snapshot
 echo "--- Syncing portage snapshot ---"
-emerge-webrsync
+(emerge-webrsync &)
+wait
 
 # setting locale
 echo "--- Setting locale ---"
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
-locale-gen
+(locale-gen &)
+wait
 eselect locale list
-read "Enter the number of your desired locale:" locale_num
+read -p "Enter the number of your desired locale:" locale_num
 eselect locale set ${locale_num}
 source /etc/profile
 env-update
@@ -24,12 +26,13 @@ PS1="(chroot) ${PS1}"
 
 # list and select profile
 eselect profile list
-read "Enter the number of your desired profile: " profile_num
+read -p "Enter the number of your desired profile: " profile_num
 eselect profile set ${profile_num}
 
 # emerging necessary packages for setup
 echo "--- Emerging necessary packages for setup ---"
-emerge --quiet-build app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
+(emerge --quiet-build app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git &)
+wait
 
 # detecting gpu vendor
 echo "--- Detecting GPU --- "
@@ -74,52 +77,11 @@ GENTOO_MIRRORS=\"https://mirrors.mit.edu/gentoo-distfiles https://mirrors.rit.ed
 # set package.use
 echo "--- Writing package.use --- "
 rm -rf /etc/portage/package.use
-echo "www-client/ungoogled-chromium-bin widevine
-media-video/vlc -vaapi
-media-libs/libsndfile minimal
-sys-apps/systemd cryptsetup
-sys-boot/grub device-mapper
-sys-kernel/installkernel-gentoo grub
-sys-apps/dbus abi_x86_32
-
-# STEAM #
-x11-libs/libX11  abi_x86_32
-x11-libs/libXau  abi_x86_32
-x11-libs/libxcb  abi_x86_32
-x11-libs/libXdmcp  abi_x86_32
-virtual/opengl  abi_x86_32
-media-libs/mesa  abi_x86_32
-dev-libs/expat  abi_x86_32
-media-libs/libglvnd  abi_x86_32
-sys-libs/zlib  abi_x86_32
-x11-libs/libdrm  abi_x86_32
-x11-libs/libxshmfence  abi_x86_32
-x11-libs/libXext  abi_x86_32
-x11-libs/libXxf86vm  abi_x86_32
-x11-libs/libXfixes  abi_x86_32
-app-arch/zstd  abi_x86_32
-sys-devel/llvm  abi_x86_32
-x11-libs/libXrandr  abi_x86_32
-x11-libs/libXrender  abi_x86_32
-dev-libs/libffi  abi_x86_32
-sys-libs/ncurses  abi_x86_32
-dev-libs/libxml2  abi_x86_32
-dev-libs/icu  abi_x86_32
-sys-libs/gpm  abi_x86_32
-virtual/libelf  abi_x86_32
-dev-libs/elfutils  abi_x86_32
-app-arch/bzip2  abi_x86_32
-net-misc/networkmanager  abi_x86_32
-dev-libs/nspr  abi_x86_32
-dev-libs/nss  abi_x86_32
-net-libs/libndp  abi_x86_32
-x11-libs/extest abi_x86_32
-dev-libs/libevdev abi_x86_32
-dev-libs/wayland abi_x86_32
-virtual/rust abi_x86_32
-dev-lang/rust-bin abi_x86_32" > /etc/portage/package.use
-
+cp /root/gentoo-setup/portage/package.use /etc/portage
 # emerging profile
 echo "--- Emerging @world...this could take awhile ---"
-emerge --oneshot sys-apps/portage
-emerge -vuDN @world
+(emerge --oneshot sys-apps/portage &)
+wait
+
+(emerge -vuDN @world &)
+wait

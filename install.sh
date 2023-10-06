@@ -22,14 +22,15 @@ fi
 
 # updating pacman keyring
 echo "--- Updating pacman keyring ---"
-pacman --noconfirm -Sy archlinux-keyring
+(pacman --noconfirm -Sy archlinux-keyring &)
+wait
 pacman-key --init
 pacman-key --populate archlinux
 
 # install git
 echo "--- Installing git ---"
-pacman --noconfirm -Sy git glibc
-
+(pacman --noconfirm -Sy git glibc &)
+wait
 # wipe target drive
 echo "--- Wiping target drive --- "
 wipefs -af $disk
@@ -101,7 +102,8 @@ mount ${target_part1} /mnt/gentoo/boot/efi
 
 # cloning repo to chroot
 echo "--- Cloning git repo ---"
-git clone https://github.com/c0mpile/gentoo-setup.git /mnt/gentoo/root/gentoo-setup
+(git clone https://github.com/c0mpile/gentoo-setup.git /mnt/gentoo/root/gentoo-setup &)
+wait
 
 cd /mnt/gentoo
 
