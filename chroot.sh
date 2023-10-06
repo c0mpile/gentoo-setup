@@ -78,10 +78,16 @@ GENTOO_MIRRORS=\"https://mirrors.mit.edu/gentoo-distfiles https://mirrors.rit.ed
 echo "--- Writing package.use --- "
 rm -rf /etc/portage/package.use
 cp /root/gentoo-setup/portage/package.use /etc/portage
+
 # emerging profile
 echo "--- Emerging @world...this could take awhile ---"
+(USE="-gpm" emerge --oneshot ncurses &)
+wait
+(emerge --oneshot gpm &)
+wait
 (emerge --oneshot sys-apps/portage &)
 wait
-
+(emerge --oneshot ncurses &)
+wait
 (emerge -vuDN @world &)
 wait
