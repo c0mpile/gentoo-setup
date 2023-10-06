@@ -35,10 +35,10 @@ fi
 # writing make.conf
 echo "--- Writing make.conf --- "
 echo "COMMON_FLAGS=\"-march=native -O2 -pipe\"
-CFLAGS=\"${COMMON_FLAGS}\"
-CXXFLAGS=\"${COMMON_FLAGS}\"
-FCFLAGS=\"${COMMON_FLAGS}\"
-FFLAGS=\"${COMMON_FLAGS}\"
+CFLAGS=\"\${COMMON_FLAGS}\"
+CXXFLAGS=\"\${COMMON_FLAGS}\"
+FCFLAGS=\"\${COMMON_FLAGS}\"
+FFLAGS=\"\${COMMON_FLAGS}\"
 $(cpuid2cpuflags | sed 's/:\s/="/; s/$/"/')
 MAKEOPTS=\"-j$(nproc) -l$(nproc)\"
 EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep --ask\"

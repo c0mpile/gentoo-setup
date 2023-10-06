@@ -1,13 +1,28 @@
 #!/usr/bin/env bash
 
 # unset variables
-unset disk,subvol_options,current_stage3,work_dir
+unset target_disk,target_part1,target_part2,subvol_options,current_stage3
 
-# set current path
-work_dir=$(pwd)
+# target installation drive
+read -p 'Enter the installation target device name: ' target_disk
 
-# target installation drive - if you're using a sata drive instead of nvme you must change all instances of ${disk}p1 and ${disk}p2 in the script to ${disk}1 and {disk}2
-disk="/dev/nvme0n1"
+if [[ $(echo $disk | grep dev) =~ nvme ]]; then
+        target_part1="${target_disk}p1"
+        target_part2="${target_disk}p2"
+elif [[ $(echo $disk | grep dev) =~ {sd,hd,vd} ]]; then
+        target_part1="${target_disk}1"
+        target_part2="${target_disk}2"
+fi
+
+# updating pacman keyring
+echo "--- Updating pacman keyring ---"
+pacman --noconfirm -Sy archlinux-keyring
+pacman-key --init
+pacman-key --populate archlinux
+
+# install git
+echo "--- Installing git ---"
+pacman --noconfirm -Sy git
 
 # wipe target drive
 echo "--- Wiping target drive --- "
@@ -27,7 +42,7 @@ cryptsetup --type luks1 -v -y luksFormat ${disk}p2
 cryptsetup luksOpen ${disk}p2 crypt
 
 # create efi boot partition and btrfs root
-echo "--- Formatting partitions --- " 
+echo "--- Formatting partitions --- "
 mkfs.vfat -F32 -n ESP ${disk}p1
 mkfs.btrfs -L gentoo /dev/mapper/crypt
 
@@ -49,7 +64,6 @@ btrfs su cr /mnt/gentoo/@cache
 btrfs su cr /mnt/gentoo/@images
 
 # unmount chroot directory
-echo "--- Unmounting /mnt/gentoo --- "
 umount /mnt/gentoo
 
 # set mount options for subvolumes
@@ -79,9 +93,9 @@ mount -o ${subvol_options},subvol=@images /dev/mapper/crypt /mnt/gentoo/var/lib/
 echo "--- Mounting EFI partition --- "
 mount ${disk}p1 /mnt/gentoo/boot/efi
 
-# copy chroot script to installation directory
-cp ${work_dir}/chroot.sh /mnt/gentoo
-chmod +x /mnt/gentoo/chroot.sh
+# cloning repo to chroot
+echo "--- Cloning git repo ---"
+git clone https://github.com/c0mpile/gentoo-setup.git /mnt/gentoo/root/gentoo-setup
 
 cd /mnt/gentoo
 
@@ -128,4 +142,4 @@ genfstab -U -p /mnt/gentoo >> /mnt/gentoo/etc/fstab
 
 # enter chroot
 echo "Entering chroot..."
-chroot /mnt/gentoo /chroot.sh
+chroot /mnt/gentoo /root/gentoo-setup/chroot.sh
