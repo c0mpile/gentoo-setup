@@ -15,8 +15,12 @@ emerge --sync --quiet
 echo "--- Setting locale ---"
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
 locale-gen
+eselect locale list
+read "Enter the number of your desired locale:" locale_num
+eselect locale set ${locale_num}
 source /etc/profile
 env-update
+PS1="(chroot) ${PS1}"
 
 # emerging necessary packages for setup
 echo "--- Emerging necessary packages for setup ---"
@@ -109,3 +113,12 @@ dev-libs/libevdev abi_x86_32
 dev-libs/wayland abi_x86_32
 virtual/rust abi_x86_32
 dev-lang/rust-bin abi_x86_32" > /etc/portage/package.use
+
+# list and select profile
+eselect profile list
+read "Enter the number of your desired profile: " profile_num
+eselect profile set ${profile_num}
+
+# emerging profile
+echo "--- Emerging @world...this could take awhile ---"
+emerge -avuDN @world
