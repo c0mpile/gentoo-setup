@@ -9,7 +9,7 @@ PS1="(chroot) ${PS1}"
 
 # sync portage snapshot
 echo "--- Syncing portage snapshot ---"
-emerge --sync --quiet
+emerge-webrsync
 
 # setting locale
 echo "--- Setting locale ---"
@@ -21,6 +21,11 @@ eselect locale set ${locale_num}
 source /etc/profile
 env-update
 PS1="(chroot) ${PS1}"
+
+# list and select profile
+eselect profile list
+read "Enter the number of your desired profile: " profile_num
+eselect profile set ${profile_num}
 
 # emerging necessary packages for setup
 echo "--- Emerging necessary packages for setup ---"
@@ -45,7 +50,7 @@ FCFLAGS=\"\${COMMON_FLAGS}\"
 FFLAGS=\"\${COMMON_FLAGS}\"
 $(cpuid2cpuflags | sed 's/:\s/="/; s/$/"/')
 MAKEOPTS=\"-j$(nproc) -l$(nproc)\"
-EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep --ask\"
+EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep\"
 
 USE=\"dist-kernel systemd btrfs udev policykit udisks dbus inotify libnotify networkmanager bzip2 zstd X screencast wayland xwayland vulkan opengl gtk qt5 qt6 x264 x265 gstreamer pulseaudio alsa pipewire pipewire-jack pipewire-alsa dri vaapi vdpau cups v4l ssl lv2 unicode offensive amd64 -dvd -cdr -ios -ipod -clamav -gnome -kde -debug\"
 
@@ -114,11 +119,7 @@ dev-libs/wayland abi_x86_32
 virtual/rust abi_x86_32
 dev-lang/rust-bin abi_x86_32" > /etc/portage/package.use
 
-# list and select profile
-eselect profile list
-read "Enter the number of your desired profile: " profile_num
-eselect profile set ${profile_num}
-
 # emerging profile
 echo "--- Emerging @world...this could take awhile ---"
-emerge -avuDN @world
+emerge --oneshot sys-apps/portage
+emerge -vuDN @world

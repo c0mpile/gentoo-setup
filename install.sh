@@ -28,7 +28,7 @@ pacman-key --populate archlinux
 
 # install git
 echo "--- Installing git ---"
-pacman --noconfirm -Sy git
+pacman --noconfirm -Sy git glibc
 
 # wipe target drive
 echo "--- Wiping target drive --- "
