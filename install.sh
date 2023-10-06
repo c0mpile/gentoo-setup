@@ -1,17 +1,23 @@
 #!/usr/bin/env bash
 
 # unset variables
-unset target_disk,target_part1,target_part2,subvol_options,current_stage3
+unset disk,target_part1,target_part2,subvol_options,current_stage3
 
 # target installation drive
-read -p 'Enter the installation target device name: ' target_disk
+read -p "Enter the installation target device including /dev/: " disk
 
 if [[ $(echo $disk | grep dev) =~ nvme ]]; then
-        target_part1="${target_disk}p1"
-        target_part2="${target_disk}p2"
-elif [[ $(echo $disk | grep dev) =~ {sd,hd,vd} ]]; then
-        target_part1="${target_disk}1"
-        target_part2="${target_disk}2"
+        export target_part1="${disk}p1"
+        export target_part2="${disk}p2"
+elif [[ $(echo $disk | grep dev) =~ sd ]]; then
+        export target_part1="${disk}1"
+        export target_part2="${disk}2"
+elif [[ $(echo $disk | grep dev) =~ hd ]]; then
+        export target_part1="${disk}1"
+        export target_part2="${disk}2"
+elif [[ $(echo $disk | grep dev) =~ vd ]]; then
+        export target_part1="${disk}1"
+        export target_part2="${disk}2"
 fi
 
 # updating pacman keyring
@@ -38,12 +44,12 @@ partprobe $disk
 
 # encrypt and unlock root device
 echo "--- Setting up encryption --- "
-cryptsetup --type luks1 -v -y luksFormat ${disk}p2
-cryptsetup luksOpen ${disk}p2 crypt
+cryptsetup --type luks1 -v -y luksFormat ${target_part2}
+cryptsetup luksOpen ${target_part2} crypt
 
 # create efi boot partition and btrfs root
 echo "--- Formatting partitions --- "
-mkfs.vfat -F32 -n ESP ${disk}p1
+mkfs.vfat -F32 -n ESP ${target_part1}
 mkfs.btrfs -L gentoo /dev/mapper/crypt
 
 # create chroot directory and mount encrypted btrfs partition
@@ -91,7 +97,7 @@ mount -o ${subvol_options},subvol=@images /dev/mapper/crypt /mnt/gentoo/var/lib/
 
 # mount efi boot partiton
 echo "--- Mounting EFI partition --- "
-mount ${disk}p1 /mnt/gentoo/boot/efi
+mount ${target_part1} /mnt/gentoo/boot/efi
 
 # cloning repo to chroot
 echo "--- Cloning git repo ---"
@@ -114,13 +120,13 @@ rm -rf /mnt/gentoo/stage3-*.tar.xz
 
 # get UUIDs of target partitions
 echo "--- Finding UUIDs of target partitions --- "
-export p2_uuid=$(blkid -s UUID -o value ${disk}p2)
+export part2_uuid=$(blkid -s UUID -o value ${target_part2})
 export mapped_uuid=$(blkid -s UUID -o value /dev/mapper/crypt)
 
 # configure dracut with correct UUIDs for initramfs generation
 echo "--- Writing dracut config --- "
 echo "add_dracutmodules+=\" crypt dm rootfs-block \"" > /mnt/gentoo/etc/dracut.conf
-echo "kernel_cmdline+=\" root=UUID=${mapped_uuid} rd.luks.uuid=${p2_uuid} \"" >> /mnt/gentoo/etc/dracut.conf
+echo "kernel_cmdline+=\" root=UUID=${mapped_uuid} rd.luks.uuid=${part2_uuid} \"" >> /mnt/gentoo/etc/dracut.conf
 
 # copy dns settings
 echo "--- Copying DNS settings --- "
