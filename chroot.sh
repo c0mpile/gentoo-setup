@@ -31,8 +31,9 @@ eselect profile set ${profile_num}
 
 # emerging necessary packages for setup
 echo "--- Emerging necessary packages for setup ---"
-(emerge --quiet-build app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git &)
-wait
+emerge --ask --quiet-build app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
+etc-update
+emerge --quiet-build app-portage/cpuid2cpuflags sys-apps/lshw app-eselect/eselect-repository dev-vcs/git
 
 # detecting gpu vendor
 echo "--- Detecting GPU --- "
@@ -53,7 +54,7 @@ FCFLAGS=\"\${COMMON_FLAGS}\"
 FFLAGS=\"\${COMMON_FLAGS}\"
 $(cpuid2cpuflags | sed 's/:\s/="/; s/$/"/')
 MAKEOPTS=\"-j$(nproc) -l$(nproc)\"
-EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep\"
+EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep --ask\"
 
 USE=\"systemd X wayland xwayland screencast vulkan opengl btrfs gtk qt5 qt6 policykit udisks udev dbus networkmanager usb bzip2 zstd v4l x264 x265 ffmpeg vaapi vdpau lv2 v4l gstreamer pulseaudio alsa pipewire sndfile taglib cups unicode offensive -dvd -cdr -ios -ipod -clamav -gnome -kde -debug -webengine -qtwebengine -selinux\"
 
@@ -81,13 +82,8 @@ cp /root/gentoo-setup/portage/package.use /etc/portage
 
 # emerging profile
 echo "--- Emerging @world...this could take awhile ---"
-(USE="-gpm" emerge --oneshot ncurses &)
-wait
-(emerge --oneshot gpm &)
-wait
-(emerge --oneshot sys-apps/portage &)
-wait
-(emerge --oneshot ncurses &)
-wait
-(emerge -vuDN @world &)
-wait
+USE="-gpm" emerge --oneshot --ask ncurses
+emerge --oneshot --ask gpm
+emerge --oneshot --ask sys-apps/portage
+emerge --oneshot --ask ncurses
+emerge -vuDN @world
