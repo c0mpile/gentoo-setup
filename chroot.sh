@@ -55,7 +55,7 @@ $(cpuid2cpuflags | sed 's/:\s/="/; s/$/"/')
 MAKEOPTS=\"-j$(nproc) -l$(nproc)\"
 EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep\"
 
-USE=\"dist-kernel systemd btrfs udev policykit udisks dbus inotify libnotify networkmanager bzip2 zstd X screencast wayland xwayland vulkan opengl gtk qt5 qt6 x264 x265 gstreamer pulseaudio alsa pipewire pipewire-jack pipewire-alsa dri vaapi vdpau cups v4l ssl lv2 unicode offensive amd64 -dvd -cdr -ios -ipod -clamav -gnome -kde -debug\"
+USE=\"systemd X wayland xwayland screencast vulkan opengl btrfs gtk qt5 qt6 policykit udisks udev dbus networkmanager usb bzip2 zstd v4l x264 x265 ffmpeg vaapi vdpau lv2 v4l gstreamer pulseaudio alsa pipewire sndfile taglib cups unicode offensive -dvd -cdr -ios -ipod -clamav -gnome -kde -debug -webengine -qtwebengine -selinux\"
 
 ACCEPT_KEYWORDS=\"~amd64\"
 ACCEPT_LICENSE=\"*\"
@@ -69,7 +69,7 @@ PKGDIR=\"/var/cache/binpkgs\"
 LC_MESSAGES=C.utf8
 
 VIDEO_CARDS=\"${installed_gpu}\"
-INPUT_DEVICES=\"libinput\"
+INPUT_DEVICES=\"libinput evdev joystick\"
 GRUB_PLATFORMS=\"efi-64\"
 
 GENTOO_MIRRORS=\"https://mirrors.mit.edu/gentoo-distfiles https://mirrors.rit.edu/gentoo https://mirror.leaseweb.com/gentoo https://gentoo.osuosl.org https://mirror.clarkson.edu/gentoo\"" > /etc/portage/make.conf
