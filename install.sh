@@ -150,4 +150,5 @@ genfstab -U -p /mnt/gentoo >> /mnt/gentoo/etc/fstab
 
 # enter chroot
 echo "Entering chroot..."
-chroot /mnt/gentoo /root/gentoo-setup/chroot.sh
+#chroot /mnt/gentoo /root/gentoo-setup/chroot.sh
+chroot /mnt/gentoo /bin/bash
