@@ -6,14 +6,14 @@ dev-libs/nettle gmp
 dev-lang/perl -minimal
 sys-libs/glibc multiarch
 sys-devel/binutils plugins
-dev-libs/ncurses tinfo
+dev-libs/ncurses tinfo abi_x86_32
 dev-vcs/git curl
 net-misc/curl http2 ssl openssl curl_ssl_openssl
 media-video/pipewire pipewire-alsa sound-server ssl ffmpeg dbus extra
 sys-auth/seatd server
 sys-apps/util-linux su pam suid
-x11-drivers/nvidia-drivers driver wayland modules static-libs
-media-libs/mesa X wayland gles2 vaapi vulkan-overlay
+#x11-drivers/nvidia-drivers driver wayland modules static-libs
+media-libs/mesa X wayland gles2 vaapi vulkan-overlay abi_x86_32
 dev-libs/weston resize-optimization
 media-libs/freetype adobe-cff cleartype-hinting harfbuzz truetype png
 media-libs/harfbuzz glib icu truetype cairo graphite introspection
@@ -38,7 +38,7 @@ sys-devel/clang-runtime compiler-rt sanitize
 sys-devel/clang-common default-compiler-rt default-lld
 sys-libs/compiler-rt-sanitizers clang profile
 sys-devel/clang extra static-analyzer
-sys-devel/llvm binutils-plugin libffi ncurses
+sys-devel/llvm binutils-plugin libffi ncurses abi_x86_32
 sys-libs/libunwind static-libs
 
 # OTHERS (neovim) #
@@ -49,14 +49,11 @@ dev-lua/lua-cjson internal-fpconv
 
 ## WORLD ##
 
-app-office/libreoffice wayland gtk dbus
 app-editors/neovim lto lua_single_target_luajit -lua_single_target_lua5-4
 sys-apps/xdg-desktop-portal screencast
-gui-wm/hyprland hwdata seatd video_cards_nvidia
+gui-wm/hyprland hwdata seatd #video_cards_nvidia
 x11-terms/kitty wayland
 gui-apps/rofi-wayland drun
-mail-client/neomutt sasl notmuch
-net-mail/isync ssl
 media-gfx/imv freeimage jpeg png wayland
 media-sound/mpd ffmpeg pipewire flac cue
 media-sound/ncmpcpp taglib
@@ -64,7 +61,6 @@ net-libs/libtorrent-rasterbar dht
 media-video/mpv wayland cli libplacebo pipewire lua rubberband uchardet egl iconv nvenc lua_targets_luajit lua_single_target_luajit
 media-libs/libplacebo opengl glslang unwind
 net-p2p/qbittorrent gui qt6
-net-vpn/openvpn openssl
 sys-auth/polkit kde
 dev-libs/libpcre2 pcre16 unicode
 
@@ -91,9 +87,9 @@ media-libs/libpng apng
 media-libs/libepoxy X egl
 x11-libs/cairo X glib
 x11-libs/pango X
-sys-libs/zlib minizip # telegram chromium
-media-libs/libglvnd X
-dev-libs/libxml2 icu ftp python # chromium
+sys-libs/zlib minizip abi_x86_32 
+media-libs/libglvnd X abi_x86_32
+dev-libs/libxml2 icu ftp python abi_x86_32 # chromium
 dev-libs/xmlsec nss
 app-text/xmlto text
 dev-libs/boost icu nls # libreoffice
@@ -137,3 +133,41 @@ app-crypt/gcr gtk
 media-libs/vulkan-loader wayland
 dev-util/electron X -clang -wayland screencast -gtk4 -custom-cflags -pgo
 media-video/ffmpegthumbnailer png jpeg
+
+www-client/ungoogled-chromium-bin widevine
+media-video/vlc -vaapi
+media-libs/libsndfile minimal
+sys-apps/systemd cryptsetup
+sys-boot/grub device-mapper
+sys-kernel/installkernel-gentoo grub
+
+# STEAM #
+x11-libs/libX11  abi_x86_32
+x11-libs/libXau  abi_x86_32
+x11-libs/libxcb  abi_x86_32
+x11-libs/libXdmcp  abi_x86_32
+virtual/opengl  abi_x86_32
+dev-libs/expat  abi_x86_32
+x11-libs/libdrm  abi_x86_32
+x11-libs/libxshmfence  abi_x86_32
+x11-libs/libXext  abi_x86_32
+x11-libs/libXxf86vm  abi_x86_32
+x11-libs/libXfixes  abi_x86_32
+app-arch/zstd  abi_x86_32
+x11-libs/libXrandr  abi_x86_32
+x11-libs/libXrender  abi_x86_32
+dev-libs/libffi  abi_x86_32
+dev-libs/icu  abi_x86_32
+sys-libs/gpm  abi_x86_32
+virtual/libelf  abi_x86_32
+dev-libs/elfutils  abi_x86_32
+app-arch/bzip2  abi_x86_32
+net-misc/networkmanager  abi_x86_32
+dev-libs/nspr  abi_x86_32
+dev-libs/nss  abi_x86_32
+net-libs/libndp  abi_x86_32
+x11-libs/extest abi_x86_32
+dev-libs/libevdev abi_x86_32
+dev-libs/wayland abi_x86_32
+virtual/rust abi_x86_32
+dev-lang/rust-bin abi_x86_32

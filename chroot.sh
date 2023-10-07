@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-unset installed_gpu,locale_num,profile_num
+unset installed_gpu,locale_num,profile_num,kb_map
 
 # updating environment
 env-update
@@ -9,7 +9,7 @@ PS1="(chroot) ${PS1}"
 
 # sync portage snapshot
 echo "--- Syncing portage snapshot ---"
-(emerge-webrsync &)
+emerge-webrsync &
 wait
 
 # setting locale
@@ -58,28 +58,28 @@ CFLAGS=\"\${COMMON_FLAGS}\"
 CXXFLAGS=\"\${COMMON_FLAGS}\"
 FCFLAGS=\"\${COMMON_FLAGS}\"
 FFLAGS=\"\${COMMON_FLAGS}\"
+LDFLAGS=\"-Wl,-O2 -Wl,--as-needed\"
 $(cpuid2cpuflags | sed 's/:\s/="/; s/$/"/')
+RUST_FLAGS=\"-C debuginfo=0 -C codegen-units=1 -C target-cpu=native -C opt-level=2\"
 MAKEOPTS=\"-j$(nproc) -l$(nproc)\"
 EMERGE_DEFAULT_OPTS=\"--jobs $(nproc) --load-average $(nproc) --keep-going --verbose --quiet-build --with-bdeps=y --complete-graph=y --deep --ask\"
 
-USE=\"systemd X wayland xwayland screencast vulkan opengl btrfs gtk qt5 qt6 policykit udisks udev dbus networkmanager usb bzip2 zstd v4l x264 x265 ffmpeg vaapi vdpau lv2 v4l gstreamer pulseaudio alsa pipewire sndfile taglib cups unicode offensive -dvd -cdr -ios -ipod -clamav -gnome -kde -debug -webengine -qtwebengine -selinux\"
+USE=\"minimal X wayland xwayland screencast systemd btrfs pipewire pulseaudio alsa sndfile taglib gstreamer opengl x264 x265 v4l vdpau vaapi lv2 vulkan gtk qt5 qt6 udisks udev dbus policykit networkmanager ipv6 nftables native-symlinks lto pgo jit xs orc threads asm openmp zstd lz4 ffmpeg icu av1 harfbuzz jpeg libevent librnp libvpx png webp ssl zlib cups usb offensive -dvd -cdr -ios -ipod -clamav -gnome -kde -selinux -ufw -iptables -qtwebengine -webengine\"
 
 ACCEPT_KEYWORDS=\"~amd64\"
 ACCEPT_LICENSE=\"*\"
 
-# NOTE: This stage was built with the bindist Use flag enabled
 DISTDIR=\"/var/cache/distfiles\"
 PKGDIR=\"/var/cache/binpkgs\"
-
-# This sets the language of build output to English.
-# Please keep this setting intact when reporting bugs.
 LC_MESSAGES=C.utf8
 
 VIDEO_CARDS=\"${installed_gpu}\"
 INPUT_DEVICES=\"libinput evdev joystick\"
 GRUB_PLATFORMS=\"efi-64\"
 
-GENTOO_MIRRORS=\"https://mirrors.mit.edu/gentoo-distfiles https://mirrors.rit.edu/gentoo https://mirror.leaseweb.com/gentoo https://gentoo.osuosl.org https://mirror.clarkson.edu/gentoo\"" > /etc/portage/make.conf
+GENTOO_MIRRORS=\"https://mirrors.mit.edu/gentoo-distfiles https://mirrors.rit.edu/gentoo https://mirror.leaseweb.com/gentoo https://gentoo.osuosl.org https://mirror.clarkson.edu/gentoo\"
+FEATURES=\"candy fixlafiles parallel-install parallel-fetch\"
+FETCHCOMMANDWRAPPER_OPTIONS=\"--max-concurrent-downloads=50 --max-connection-per-server=50 --min-split-size=10M --max-file-not-found=1 --max-tries=1\"" > /etc/portage/make.conf
 
 # set package.use
 echo "--- Writing package.use --- "
