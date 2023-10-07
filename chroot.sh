@@ -83,8 +83,9 @@ FETCHCOMMANDWRAPPER_OPTIONS=\"--max-concurrent-downloads=50 --max-connection-per
 
 # set package.use
 echo "--- Writing package.use --- "
-rm -rf /etc/portage/package.use
-cp /root/gentoo-setup/portage/package.use /etc/portage
+mkdir /etc/portage/profile
+rm -rf /etc/portage/{package.use,package.accept_keywords,profile/package.unmask,use.mask}
+cp -R /root/gentoo-setup/portage/* /etc/portage
 
 # emerging profile
 echo "--- Emerging @world...this could take awhile ---"
